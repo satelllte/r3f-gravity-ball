@@ -5,6 +5,7 @@ import {
   PointerLockControls,
   useKeyboardControls,
 } from '@react-three/drei'
+import { Debug, Physics, RigidBody } from '@react-three/rapier'
 
 enum Controls {
   forward = 'forward',
@@ -63,17 +64,24 @@ export const Game = () => {
     <div className='h-screen'>
       <KeyboardControls map={keyboardControlsMap}>
         <Canvas>
-          <Camera/>
-          <PointerLockControls/>
-          <ambientLight />
-          <mesh position={[0, 1, 0]}>
-            <boxGeometry />
-            <meshStandardMaterial color="hotpink" />
-          </mesh>
-          <mesh position={[0, 0, 0]} scale={[10, 10, 10]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry />
-            <meshStandardMaterial color="cyan" />
-          </mesh>
+          <Physics>
+            {process.env.NODE_ENV === 'development' && <Debug/>}
+            <Camera/>
+            <PointerLockControls/>
+            <ambientLight />
+            <RigidBody>
+              <mesh position={[0, 4, 0]} rotation={[0, Math.PI / 6, Math.PI / 6]}>
+                <boxGeometry />
+                <meshStandardMaterial color="hotpink" />
+              </mesh>
+            </RigidBody>
+            <RigidBody type='fixed'>
+              <mesh position={[0, 0, 0]} scale={[10, 10, 10]} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry />
+                <meshStandardMaterial color="cyan" />
+              </mesh>
+            </RigidBody>
+          </Physics>
         </Canvas>
       </KeyboardControls>
     </div>
