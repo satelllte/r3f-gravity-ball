@@ -66,9 +66,13 @@ export const Game = () => {
           <Camera/>
           <PointerLockControls/>
           <ambientLight />
-          <mesh position={[0, 0, 1]}>
+          <mesh position={[0, 1, 0]}>
             <boxGeometry />
             <meshStandardMaterial color="hotpink" />
+          </mesh>
+          <mesh position={[0, 0, 0]} scale={[10, 10, 10]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry />
+            <meshStandardMaterial color="cyan" />
           </mesh>
         </Canvas>
       </KeyboardControls>
