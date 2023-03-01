@@ -1,6 +1,6 @@
-# Dark FPS
+# Dark Ball
 
-First person shooter with Next.js & React-Three-Fiber.
+Ball game based on React-Three-Fiber.
 
 ## Local development
 
