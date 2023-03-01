@@ -1,14 +1,41 @@
-import { useRef } from 'react'
-import type { Mesh } from 'three'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import {
+  Fragment,
+  useEffect,
+  useRef,
+} from 'react'
+import {
+  Mesh,
+  TextureLoader,
+  Vector3,
+} from 'three'
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  useLoader,
+} from '@react-three/fiber'
 import {
   KeyboardControls,
   KeyboardControlsEntry,
-  PointerLockControls,
   useKeyboardControls,
 } from '@react-three/drei'
-import type { RapierRigidBody } from '@react-three/rapier'
-import { Debug, Physics, RigidBody } from '@react-three/rapier'
+import {
+  Physics,
+  Debug,
+  useBox,
+  useSphere,
+  Triplet,
+} from '@react-three/cannon'
+
+const cameraShiftX = 0
+const cameraShiftY = 4
+const cameraShiftZ = 9
+
+const material = {
+  name: 'bouncy',
+  restitution: 0.6,
+  friction: 1.1,
+}
 
 enum Controls {
   forward = 'forward',
@@ -26,103 +53,126 @@ const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
   { name: Controls.jump, keys: ['Space'] },
 ]
 
-const Camera = () => {
-  const speed = 5
+const Player = () => {
+  const colorMap = useLoader(TextureLoader, '/ball-texture.png')
+
+  const [ref, api] = useSphere(
+    () => ({
+      mass: 1,
+      material,
+      position: [0, 2, 0],
+      linearDamping: 0.5,
+    }),
+    useRef<Mesh>(null)
+  )
+
   const { camera } = useThree()
+  const positionRef = useRef<Triplet>([0, 1, 0])
 
   const [, getControls] = useKeyboardControls<Controls>()
 
+  useEffect(() => {
+    const unsubscribe = api.position.subscribe((position) => {
+      positionRef.current = position
+    })
+    return unsubscribe
+  }, [api])
+
   useFrame((_, delta) => {
+    camera.position.lerp(
+      new Vector3(
+        positionRef.current[0] + cameraShiftX,
+        positionRef.current[1] + cameraShiftY,
+        positionRef.current[2] + cameraShiftZ,
+      ),
+      delta * 10,
+    )
+
     const {
       forward,
       left,
       right,
       back,
+      jump,
     } = getControls()
 
-    let z = 0
-    let x = 0
+    const centerPoint: Triplet = [0, 0, 0]
 
-    z -= forward ? 1 : 0
-    z += back ? 1 : 0
-    x -= left ? 1 : 0
-    x += right ? 1 : 0
-
-    if (z !== 0) {
-      z = speed * delta * z
+    if (forward) {
+      api.applyImpulse([0, 0, -1], centerPoint)
     }
-    if (x !== 0) {
-      x = speed * delta * x
+    if (back) {
+      api.applyImpulse([0, 0, 1], centerPoint)
     }
-
-    camera.translateZ(z)
-    camera.translateX(x)
+    if (left) {
+      api.applyImpulse([-1, 0, 0], centerPoint)
+    }
+    if (right) {
+      api.applyImpulse([1, 0, 0], centerPoint)
+    }
+    if (jump) {
+      api.applyImpulse([0, 1, 0], centerPoint)
+    }
   })
 
   return (
-    null
+    <mesh
+      ref={ref}
+    >
+      <sphereGeometry />
+      <meshStandardMaterial map={colorMap} />
+    </mesh>
   )
 }
 
-const Player = () => {
-  const rbRef = useRef<RapierRigidBody>(null)
-  const meshRef = useRef<Mesh>(null)
+interface SectorProps {
+  sizeX?: number
+  sizeZ?: number
+  positionX?: number
+  positionZ?: number
+}
 
-  const [, getControls] = useKeyboardControls<Controls>()
-
-  useFrame(() => {
-    if (!rbRef.current) {
-      return
-    }
-    const rb = rbRef.current
-
-    const { jump } = getControls()
-    if (!jump) {
-      return
-    }
-
-    rb.applyImpulse({ x: 0, y: 0.5, z: 0 }, true)
-    console.info('meshRef.current?.position: ', meshRef.current?.position)
-  })
-  
+const Sector = ({
+  sizeX = 1,
+  sizeZ = 1,
+}: SectorProps) => {
+  const cellSize = 6
+  const args: Triplet = [cellSize * sizeX, 0.75, cellSize * sizeZ]
+  const [ref] = useBox(() => ({
+      args,
+      material,
+      position: [0, -2, 0], // TODO: parametrize
+    }),
+    useRef<Mesh>(null),
+  )
   return (
-    <RigidBody ref={rbRef} type='dynamic' lockRotations>
-      <mesh ref={meshRef} position={[-2, 2, -2]}>
-        <boxGeometry />
-        <meshStandardMaterial color='green' />
-      </mesh>
-    </RigidBody>
+    <mesh
+      ref={ref}
+    >
+      <boxGeometry args={args}/>
+      <meshStandardMaterial color="hotpink" />
+    </mesh>
   )
 }
 
 export const Game = () => {
+
+  const CannonDebug = process.env.NODE_ENV === 'development' ? Debug : Fragment
+
   return (
     <div className='h-screen'>
       <KeyboardControls map={keyboardControlsMap}>
         <Canvas
           camera={{
-            position: [2, 1, 2],
-            rotation: [-Math.PI / 6, 0, 0],
+            position: [cameraShiftX, cameraShiftY, cameraShiftZ],
           }}
         >
+          <ambientLight />
           <Physics>
-            {process.env.NODE_ENV === 'development' && <Debug/>}
-            <Camera/>
-            <Player/>
-            <PointerLockControls/>
-            <ambientLight />
-            <RigidBody>
-              <mesh position={[0, 10, 0]} rotation={[0, Math.PI / 6, Math.PI / 6]}>
-                <boxGeometry />
-                <meshStandardMaterial color="hotpink" />
-              </mesh>
-            </RigidBody>
-            <RigidBody type='fixed'>
-              <mesh position={[0, 0, 0]} scale={[10, 10, 10]} rotation={[-Math.PI / 2, 0, 0]}>
-                <planeGeometry />
-                <meshStandardMaterial color="cyan" />
-              </mesh>
-            </RigidBody>
+            <CannonDebug color="green" scale={1.01}>
+              <Player/>
+              <Sector sizeZ={3}/>
+            </CannonDebug>
           </Physics>
         </Canvas>
       </KeyboardControls>
