@@ -13,7 +13,6 @@
     "@react-three/cannon": "6.5.2",
     "@react-three/drei": "9.56.25",
     "@react-three/fiber": "8.11.2",
-    "@react-three/rapier": "0.13.2",
     "cannon-es": "0.20.0",
     "next": "13.1.6",
     "react": "18.2.0",
