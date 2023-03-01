@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import type { Mesh } from 'three'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   KeyboardControls,
@@ -5,6 +7,7 @@ import {
   PointerLockControls,
   useKeyboardControls,
 } from '@react-three/drei'
+import type { RapierRigidBody } from '@react-three/rapier'
 import { Debug, Physics, RigidBody } from '@react-three/rapier'
 
 enum Controls {
@@ -12,6 +15,7 @@ enum Controls {
   left = 'left',
   right = 'right',
   back = 'back',
+  jump = 'jump',
 }
 
 const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
@@ -19,6 +23,7 @@ const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
   { name: Controls.left, keys: ['ArrowLeft', 'KeyA'] },
   { name: Controls.right, keys: ['ArrowRight', 'KeyD'] },
   { name: Controls.back, keys: ['ArrowDown', 'KeyS'] },
+  { name: Controls.jump, keys: ['Space'] },
 ]
 
 const Camera = () => {
@@ -59,18 +64,55 @@ const Camera = () => {
   )
 }
 
+const Player = () => {
+  const rbRef = useRef<RapierRigidBody>(null)
+  const meshRef = useRef<Mesh>(null)
+
+  const [, getControls] = useKeyboardControls<Controls>()
+
+  useFrame(() => {
+    if (!rbRef.current) {
+      return
+    }
+    const rb = rbRef.current
+
+    const { jump } = getControls()
+    if (!jump) {
+      return
+    }
+
+    rb.applyImpulse({ x: 0, y: 0.5, z: 0 }, true)
+    console.info('meshRef.current?.position: ', meshRef.current?.position)
+  })
+  
+  return (
+    <RigidBody ref={rbRef} type='dynamic' lockRotations>
+      <mesh ref={meshRef} position={[-2, 2, -2]}>
+        <boxGeometry />
+        <meshStandardMaterial color='green' />
+      </mesh>
+    </RigidBody>
+  )
+}
+
 export const Game = () => {
   return (
     <div className='h-screen'>
       <KeyboardControls map={keyboardControlsMap}>
-        <Canvas>
+        <Canvas
+          camera={{
+            position: [2, 1, 2],
+            rotation: [-Math.PI / 6, 0, 0],
+          }}
+        >
           <Physics>
             {process.env.NODE_ENV === 'development' && <Debug/>}
             <Camera/>
+            <Player/>
             <PointerLockControls/>
             <ambientLight />
             <RigidBody>
-              <mesh position={[0, 4, 0]} rotation={[0, Math.PI / 6, Math.PI / 6]}>
+              <mesh position={[0, 10, 0]} rotation={[0, Math.PI / 6, Math.PI / 6]}>
                 <boxGeometry />
                 <meshStandardMaterial color="hotpink" />
               </mesh>
