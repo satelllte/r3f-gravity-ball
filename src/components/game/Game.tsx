@@ -35,7 +35,7 @@ const cameraShiftY = 4
 const cameraShiftZ = 9
 
 const material = {
-  name: 'bouncy',
+  name: 'defaultMaterial',
   restitution: 0.6,
   friction: 1.1,
 }
