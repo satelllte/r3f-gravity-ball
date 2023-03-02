@@ -1,5 +1,6 @@
 import {
   Fragment,
+  useCallback,
   useEffect,
   useRef,
 } from 'react'
@@ -26,11 +27,23 @@ import {
   useSphere,
   Triplet,
 } from '@react-three/cannon'
+import {
+  RecoilRoot,
+  atom,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil'
 import { HideMouse } from './HideMouse'
 
+/**
+ * Constants (development only)
+ */
 const isDev = process.env.NODE_ENV === 'development'
 const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1'
 
+/**
+ * Constants
+ */
 const cameraShiftX = 0
 const cameraShiftY = 4
 const cameraShiftZ = 9
@@ -41,12 +54,26 @@ const material = {
   friction: 1.1,
 }
 
+/**
+ * State
+ */
+enum GameState {
+  inMenu = 'inMenu',
+  playing = 'playing',
+}
+const gameState = atom<GameState>({
+  key: 'gameState',
+  default: GameState.inMenu,
+});
+
+/**
+ * Keyboard input
+ */
 enum Controls {
   forward = 'forward',
   left = 'left',
   right = 'right',
   back = 'back',
-  jump = 'jump',
 }
 
 const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
@@ -54,10 +81,15 @@ const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
   { name: Controls.left, keys: ['ArrowLeft', 'KeyA'] },
   { name: Controls.right, keys: ['ArrowRight', 'KeyD'] },
   { name: Controls.back, keys: ['ArrowDown', 'KeyS'] },
-  { name: Controls.jump, keys: ['Space'] },
 ]
 
+/**
+ * Player component
+ */
 const Player = () => {
+  const [_gameState, setGameState] = useRecoilState(gameState)
+  const isPlaying = _gameState === GameState.playing
+
   const colorMap = useLoader(TextureLoader, '/ball-texture.png')
 
   const [ref, api] = useSphere(
@@ -75,6 +107,15 @@ const Player = () => {
   const positionRef = useRef<Triplet>([0, 1, 0])
 
   const [, getControls] = useKeyboardControls<Controls>()
+
+  useEffect(() => {
+    camera.position.set(cameraShiftX, cameraShiftY, cameraShiftZ)
+    camera.lookAt(
+      positionRef.current[0],
+      positionRef.current[1],
+      positionRef.current[2],
+    )
+  }, [camera])
 
   useEffect(() => {
     const unsubscribe = api.position.subscribe((position) => {
@@ -101,12 +142,19 @@ const Player = () => {
       )
     }
 
+    if (positionRef.current[1] < -12.5) {
+      setGameState(GameState.inMenu)
+    }
+
+    if (!isPlaying) {
+      return
+    }
+
     const {
       forward,
       left,
       right,
       back,
-      jump,
     } = getControls()
 
     const centerPoint: Triplet = [0, 0, 0]
@@ -123,9 +171,6 @@ const Player = () => {
     if (right) {
       api.applyImpulse([1, 0, 0], centerPoint)
     }
-    if (jump) {
-      api.applyImpulse([0, 1, 0], centerPoint)
-    }
   })
 
   return (
@@ -138,6 +183,9 @@ const Player = () => {
   )
 }
 
+/**
+ * Sector component
+ */
 type SectorType =
   | 'default'
   | 'start'
@@ -194,30 +242,83 @@ const Sector = ({
   )
 }
 
-export const Game = () => {
+const GamePhysicsComponents = () => {
   const CannonDebug = isPhysicsDebug ? Debug : Fragment
 
+  const _gameState = useRecoilValue(gameState)
+  const isPlaying = _gameState === GameState.playing
+
   return (
-    <div className='h-screen'>
-      <HideMouse/>
-      <KeyboardControls map={keyboardControlsMap}>
-        <Canvas
-          camera={{
-            position: [cameraShiftX, cameraShiftY, cameraShiftZ],
-          }}
-        >
-          <ambientLight />
-          <Physics>
-            <CannonDebug color="green" scale={1.01}>
-              <Player/>
-              <Sector type='start'/>
-              <Sector z={1} sizeZ={8}/>
-              <Sector z={9} sizeX={4}/>
-              <Sector type='finish' z={9} x={4}/>
-            </CannonDebug>
-          </Physics>
-        </Canvas>
-      </KeyboardControls>
+    <Physics>
+      <CannonDebug color="green" scale={1.01}>
+        {isPlaying && <Player/>}
+        <Sector type='start'/>
+        <Sector z={1} sizeZ={8}/>
+        <Sector z={9} sizeX={4}/>
+        <Sector type='finish' z={9} x={4}/>
+      </CannonDebug>
+    </Physics>
+  )
+}
+
+/**
+ * UI component
+ */
+const UI = () => {
+  const [_gameState, setGameState] = useRecoilState(gameState)
+  const inMenu = _gameState === GameState.inMenu
+  
+  const start = useCallback(() => {
+    setGameState(GameState.playing)
+  }, [setGameState])
+
+  useEffect(() => {
+    if (!inMenu) {
+      return
+    }
+    
+    const onKeyDown = () => {
+      start()
+    }
+
+    document.addEventListener('keydown', onKeyDown, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [inMenu, start])
+
+  if (!inMenu) {
+    return null
+  }
+
+  return (
+    <div onClick={start} className='absolute inset-0 z-10 bg-black/50 flex flex-col justify-center items-center'>
+      <h1>Press any key to play</h1>
     </div>
+  )
+}
+
+/**
+ * Game entry
+ */
+export const Game = () => {
+  return (
+    <RecoilRoot>
+      <div className='h-screen'>
+        <UI/>
+        <HideMouse/>
+        <KeyboardControls map={keyboardControlsMap}>
+          <Canvas
+            camera={{
+              position: [cameraShiftX, cameraShiftY, cameraShiftZ],
+            }}
+          >
+            <ambientLight />
+            <GamePhysicsComponents/>
+          </Canvas>
+        </KeyboardControls>
+      </div>
+    </RecoilRoot>
   )
 }
