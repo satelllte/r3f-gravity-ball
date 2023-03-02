@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { Game } from '@/components/game'
+import { Game } from '@/components'
 
 const HomePage = () => {
   return (
