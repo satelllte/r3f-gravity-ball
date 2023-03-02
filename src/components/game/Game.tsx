@@ -26,6 +26,7 @@ import {
   useSphere,
   Triplet,
 } from '@react-three/cannon'
+import { HideMouse } from './HideMouse'
 
 const isDev = process.env.NODE_ENV === 'development'
 const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1'
@@ -181,6 +182,7 @@ export const Game = () => {
 
   return (
     <div className='h-screen'>
+      <HideMouse/>
       <KeyboardControls map={keyboardControlsMap}>
         <Canvas
           camera={{
