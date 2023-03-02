@@ -35,8 +35,6 @@ const cameraShiftX = 0
 const cameraShiftY = 4
 const cameraShiftZ = 9
 
-const cellSize = 6
-
 const material = {
   name: 'defaultMaterial',
   restitution: 0.6,
@@ -147,33 +145,34 @@ type SectorType =
 
 interface SectorProps {
   type?: SectorType
-  tileSizeX?: number
-  tileSizeZ?: number
-  tilePositionX?: number
-  tilePositionZ?: number
+  sizeX?: number
+  sizeZ?: number
+  x?: number
+  z?: number
 }
 
 const Sector = ({
   type = 'default',
-  tileSizeX = 1,
-  tileSizeZ = 1,
-  tilePositionX = 0,
-  tilePositionZ = 0,
+  sizeX = 1,
+  sizeZ = 1,
+  x = 0,
+  z = 0,
 }: SectorProps) => {
-  const args: Triplet = [cellSize * tileSizeX, 0.75, cellSize * tileSizeZ]
+  const size = 6
+  const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
   const [ref] = useBox(() => ({
+      args,
+      material,
+      position: [
+        x * size + (size * (sizeX - 1) * 0.5),
+        -2,
+        -z * size - (size * (sizeZ - 1) * 0.5),
+      ],
       onCollideBegin: (e) => {
         if (type === 'finish') {
           console.info('finish')
         }
       },
-      args,
-      material,
-      position: [
-        tilePositionX * cellSize + (cellSize * (tileSizeX - 1) * 0.5),
-        -2,
-        -tilePositionZ * cellSize - (cellSize * (tileSizeZ - 1) * 0.5),
-      ],
     }),
     useRef<Mesh>(null),
   )
@@ -212,9 +211,9 @@ export const Game = () => {
             <CannonDebug color="green" scale={1.01}>
               <Player/>
               <Sector type='start'/>
-              <Sector tilePositionZ={1} tileSizeZ={8}/>
-              <Sector tilePositionZ={9} tileSizeX={4}/>
-              <Sector type='finish' tilePositionZ={9} tilePositionX={4}/>
+              <Sector z={1} sizeZ={8}/>
+              <Sector z={9} sizeX={4}/>
+              <Sector type='finish' z={9} x={4}/>
             </CannonDebug>
           </Physics>
         </Canvas>
