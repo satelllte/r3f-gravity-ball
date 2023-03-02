@@ -70,7 +70,7 @@ const Player = () => {
       // linearDamping: 0.5,
       angularDamping: 0.35,
     }),
-    useRef<Mesh>(null)
+    useRef<Mesh>(null),
   )
 
   const { camera } = useThree()
@@ -140,8 +140,13 @@ const Player = () => {
   )
 }
 
+type SectorType =
+  | 'default'
+  | 'start'
+  | 'finish'
+
 interface SectorProps {
-  color?: string
+  type?: SectorType
   tileSizeX?: number
   tileSizeZ?: number
   tilePositionX?: number
@@ -149,7 +154,7 @@ interface SectorProps {
 }
 
 const Sector = ({
-  color = 'hotpink',
+  type = 'default',
   tileSizeX = 1,
   tileSizeZ = 1,
   tilePositionX = 0,
@@ -157,6 +162,11 @@ const Sector = ({
 }: SectorProps) => {
   const args: Triplet = [cellSize * tileSizeX, 0.75, cellSize * tileSizeZ]
   const [ref] = useBox(() => ({
+      onCollideBegin: (e) => {
+        if (type === 'finish') {
+          console.info('finish')
+        }
+      },
       args,
       material,
       position: [
@@ -167,6 +177,14 @@ const Sector = ({
     }),
     useRef<Mesh>(null),
   )
+
+  let color = 'gray'
+  if (type === 'start') {
+    color = 'cyan'
+  } else if (type === 'finish') {
+    color = 'lime'
+  }
+
   return (
     <mesh
       ref={ref}
@@ -193,9 +211,10 @@ export const Game = () => {
           <Physics>
             <CannonDebug color="green" scale={1.01}>
               <Player/>
-              <Sector/>
-              <Sector color='gray' tilePositionZ={1} tileSizeZ={4}/>
-              <Sector color='cyan' tilePositionZ={5} tileSizeX={3}/>
+              <Sector type='start'/>
+              <Sector tilePositionZ={1} tileSizeZ={8}/>
+              <Sector tilePositionZ={9} tileSizeX={4}/>
+              <Sector type='finish' tilePositionZ={9} tilePositionX={4}/>
             </CannonDebug>
           </Physics>
         </Canvas>
