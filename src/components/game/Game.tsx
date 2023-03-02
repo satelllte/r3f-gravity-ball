@@ -26,17 +26,9 @@ import {
   useSphere,
   Triplet,
 } from '@react-three/cannon'
-import {
-  EffectComposer,
-  DepthOfField,
-  Bloom,
-  Noise,
-  Vignette,
-} from '@react-three/postprocessing'
 
 const isDev = process.env.NODE_ENV === 'development'
 const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1'
-const isPostProcessingOff = isDev && process.env.NEXT_PUBLIC_DEV_POST_PROCESSING_OFF === '1'
 
 const cameraShiftX = 0
 const cameraShiftY = 4
@@ -181,17 +173,9 @@ export const Game = () => {
           <Physics>
             <CannonDebug color="green" scale={1.01}>
               <Player/>
-              <Sector sizeZ={3}/>
+              <Sector/>
             </CannonDebug>
           </Physics>
-          {!isPostProcessingOff && (
-            <EffectComposer>
-              <DepthOfField focusDistance={0} focalLength={0.02} bokehScale={1} height={480} />
-              <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
-              <Noise opacity={0.1} />
-              <Vignette eskil={false} offset={0.1} darkness={0.5} />
-            </EffectComposer>
-          )}
         </Canvas>
       </KeyboardControls>
     </div>
