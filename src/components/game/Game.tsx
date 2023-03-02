@@ -34,6 +34,8 @@ const cameraShiftX = 0
 const cameraShiftY = 4
 const cameraShiftZ = 9
 
+const cellSize = 6
+
 const material = {
   name: 'defaultMaterial',
   restitution: 0.6,
@@ -63,8 +65,9 @@ const Player = () => {
     () => ({
       mass: 1,
       material,
-      position: [0, 2, 0],
-      linearDamping: 0.5,
+      position: [0, 1, 0],
+      // linearDamping: 0.5,
+      angularDamping: 0.35,
     }),
     useRef<Mesh>(null)
   )
@@ -82,14 +85,22 @@ const Player = () => {
   }, [api])
 
   useFrame((_, delta) => {
-    camera.position.lerp(
-      new Vector3(
-        positionRef.current[0] + cameraShiftX,
-        positionRef.current[1] + cameraShiftY,
-        positionRef.current[2] + cameraShiftZ,
-      ),
-      delta * 10,
-    )
+    if (positionRef.current[1] > -2.5) {
+      camera.position.lerp(
+        new Vector3(
+          positionRef.current[0] + cameraShiftX,
+          positionRef.current[1] + cameraShiftY,
+          positionRef.current[2] + cameraShiftZ,
+        ),
+        delta * 10,
+      )
+    } else {
+      camera.lookAt(
+        positionRef.current[0],
+        positionRef.current[1],
+        positionRef.current[2],
+      )
+    }
 
     const {
       forward,
@@ -129,22 +140,29 @@ const Player = () => {
 }
 
 interface SectorProps {
-  sizeX?: number
-  sizeZ?: number
-  positionX?: number
-  positionZ?: number
+  color?: string
+  tileSizeX?: number
+  tileSizeZ?: number
+  tilePositionX?: number
+  tilePositionZ?: number
 }
 
 const Sector = ({
-  sizeX = 1,
-  sizeZ = 1,
+  color = 'hotpink',
+  tileSizeX = 1,
+  tileSizeZ = 1,
+  tilePositionX = 0,
+  tilePositionZ = 0,
 }: SectorProps) => {
-  const cellSize = 6
-  const args: Triplet = [cellSize * sizeX, 0.75, cellSize * sizeZ]
+  const args: Triplet = [cellSize * tileSizeX, 0.75, cellSize * tileSizeZ]
   const [ref] = useBox(() => ({
       args,
       material,
-      position: [0, -2, 0], // TODO: parametrize
+      position: [
+        tilePositionX * cellSize + (cellSize * (tileSizeX - 1) * 0.5),
+        -2,
+        -tilePositionZ * cellSize - (cellSize * (tileSizeZ - 1) * 0.5),
+      ],
     }),
     useRef<Mesh>(null),
   )
@@ -153,7 +171,7 @@ const Sector = ({
       ref={ref}
     >
       <boxGeometry args={args}/>
-      <meshStandardMaterial color="hotpink" />
+      <meshStandardMaterial color={color} />
     </mesh>
   )
 }
@@ -174,6 +192,8 @@ export const Game = () => {
             <CannonDebug color="green" scale={1.01}>
               <Player/>
               <Sector/>
+              <Sector color='gray' tilePositionZ={1} tileSizeZ={4}/>
+              <Sector color='cyan' tilePositionZ={5} tileSizeX={3}/>
             </CannonDebug>
           </Physics>
         </Canvas>
