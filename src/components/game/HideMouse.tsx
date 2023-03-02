@@ -7,22 +7,31 @@ export const HideMouse = () => {
   useEffect(() => {
     let isIdle = true
 
-    const hideMouse = debounce(() => {
+    const hideMouse = () => {
       isIdle = true
       document.documentElement.style.cursor = 'none'
-    }, delay)
+    }
+
+    const showMouse = () => {
+      isIdle = false
+      document.documentElement.style.cursor = ''
+    }
+
+    const hideMouseDebounced = debounce(hideMouse, delay)
 
     const onMouseMovement = () => {
       if (isIdle) {
-        isIdle = false
-        document.documentElement.style.cursor = ''
+        showMouse()
       }
-      hideMouse()
+      hideMouseDebounced()
     }
 
     window.addEventListener('mousemove', onMouseMovement, { passive: true })
 
-    return () => window.removeEventListener('mousemove', onMouseMovement)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMovement)
+      showMouse()
+    }
   }, [])
 
   return null
