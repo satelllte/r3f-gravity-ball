@@ -8,6 +8,8 @@ import {
   Mesh,
   TextureLoader,
   Vector3,
+  PointLight,
+  PointLightHelper,
 } from 'three'
 import {
   Canvas,
@@ -18,6 +20,7 @@ import {
 import {
   KeyboardControls,
   KeyboardControlsEntry,
+  useHelper,
   useKeyboardControls,
 } from '@react-three/drei'
 import {
@@ -32,6 +35,7 @@ import {
   atom,
   useRecoilState,
   useRecoilValue,
+  useSetRecoilState,
 } from 'recoil'
 import { HideMouse } from './HideMouse'
 
@@ -40,6 +44,7 @@ import { HideMouse } from './HideMouse'
  */
 const isDev = process.env.NODE_ENV === 'development'
 const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1'
+const isLightDebug = isDev && process.env.NEXT_PUBLIC_DEV_LIGHT_DEBUG === '1'
 
 /**
  * Constants
@@ -47,6 +52,11 @@ const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1
 const cameraShiftX = 0
 const cameraShiftY = 4
 const cameraShiftZ = 9
+
+// point light position shift is relative to camera position
+const pointLightShiftX = 3
+const pointLightShiftY = 1
+const pointLightShiftZ = -2
 
 const material = {
   name: 'defaultMaterial',
@@ -58,12 +68,14 @@ const material = {
  * State
  */
 enum GameState {
-  inMenu = 'inMenu',
+  initial = 'initial',
   playing = 'playing',
+  lost = 'lost',
+  won = 'won',
 }
 const gameState = atom<GameState>({
   key: 'gameState',
-  default: GameState.inMenu,
+  default: GameState.initial,
 });
 
 /**
@@ -125,6 +137,10 @@ const Player = () => {
   }, [api])
 
   useFrame((_, delta) => {
+    if (!isPlaying) {
+      return
+    }
+
     if (positionRef.current[1] > -2.5) {
       camera.position.lerp(
         new Vector3(
@@ -143,11 +159,7 @@ const Player = () => {
     }
 
     if (positionRef.current[1] < -12.5) {
-      setGameState(GameState.inMenu)
-    }
-
-    if (!isPlaying) {
-      return
+      setGameState(GameState.lost)
     }
 
     const {
@@ -176,6 +188,8 @@ const Player = () => {
   return (
     <mesh
       ref={ref}
+      receiveShadow
+      castShadow
     >
       <sphereGeometry />
       <meshStandardMaterial map={colorMap} />
@@ -208,6 +222,7 @@ const Sector = ({
 }: SectorProps) => {
   const size = 6
   const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
+  const setGameState = useSetRecoilState(gameState)
   const [ref] = useBox(() => ({
       args,
       material,
@@ -216,10 +231,13 @@ const Sector = ({
         -2,
         -z * size - (size * (sizeZ - 1) * 0.5),
       ],
-      onCollideBegin: (e) => {
-        if (type === 'finish') {
-          console.info('finish')
+      onCollideBegin: () => {
+        if (type !== 'finish') {
+          return
         }
+        setTimeout(() => {
+          setGameState(GameState.won)
+        }, 200)
       },
     }),
     useRef<Mesh>(null),
@@ -235,6 +253,7 @@ const Sector = ({
   return (
     <mesh
       ref={ref}
+      receiveShadow
     >
       <boxGeometry args={args}/>
       <meshStandardMaterial color={color} />
@@ -244,13 +263,14 @@ const Sector = ({
 
 const GamePhysicsComponents = () => {
   const CannonDebug = isPhysicsDebug ? Debug : Fragment
+  const cannonDebugProps = isPhysicsDebug ? { color: 'green', scale: 1.01 } : {} 
 
   const _gameState = useRecoilValue(gameState)
   const isPlaying = _gameState === GameState.playing
 
   return (
     <Physics>
-      <CannonDebug color="green" scale={1.01}>
+      <CannonDebug {...cannonDebugProps}>
         {isPlaying && <Player/>}
         <Sector type='start'/>
         <Sector z={1} sizeZ={8}/>
@@ -261,19 +281,63 @@ const GamePhysicsComponents = () => {
   )
 }
 
+const Light = () => {
+  const { camera } = useThree()
+  const pointLightRef = useRef<PointLight>(null)
+
+  useHelper(
+    isLightDebug && pointLightRef as React.MutableRefObject<PointLight>,
+    PointLightHelper,
+    2,
+    'red',
+  )
+
+  useFrame((_, delta) => {
+    if (!pointLightRef.current) {
+      return
+    }
+
+    const pointLight = pointLightRef.current
+
+    pointLight.position.lerp(
+      new Vector3(
+        camera.position.x + pointLightShiftX,
+        camera.position.y + pointLightShiftY,
+        camera.position.z + pointLightShiftZ,
+      ),
+      delta * 5,
+    )
+  })
+
+  return (
+    <>
+      <pointLight
+        ref={pointLightRef}
+        intensity={0.9}
+        castShadow
+        position={[3, 4, 3]}
+      />
+      <ambientLight intensity={0.05}/>
+    </>
+  )
+}
+
 /**
  * UI component
  */
 const UI = () => {
   const [_gameState, setGameState] = useRecoilState(gameState)
-  const inMenu = _gameState === GameState.inMenu
-  
+  const initial = _gameState === GameState.initial
+  const lost = _gameState === GameState.lost
+  const won = _gameState === GameState.won
+  const skip = !initial && !lost && !won
+
   const start = useCallback(() => {
     setGameState(GameState.playing)
   }, [setGameState])
 
   useEffect(() => {
-    if (!inMenu) {
+    if (skip) {
       return
     }
     
@@ -286,15 +350,17 @@ const UI = () => {
     return () => {
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [inMenu, start])
+  }, [skip, start])
 
-  if (!inMenu) {
+  if (skip) {
     return null
   }
 
   return (
     <div onClick={start} className='absolute inset-0 z-10 bg-black/50 flex flex-col justify-center items-center'>
-      <h1>Press any key to play</h1>
+      {lost && <div>LOST</div>}
+      {won && <div>WON</div>}
+      <div>Press any key to play</div>
     </div>
   )
 }
@@ -310,11 +376,12 @@ export const Game = () => {
         <HideMouse/>
         <KeyboardControls map={keyboardControlsMap}>
           <Canvas
+            shadows='basic'
             camera={{
               position: [cameraShiftX, cameraShiftY, cameraShiftZ],
             }}
           >
-            <ambientLight />
+            <Light/>
             <GamePhysicsComponents/>
           </Canvas>
         </KeyboardControls>
