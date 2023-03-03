@@ -25,22 +25,30 @@ const LevelObjects = () => {
   const isPlaying = _gameState === GameState.playing
 
   const currentLevel = useRecoilValue(levelState)
-  const level = levels[currentLevel - 1]
+  const { sectors, finish } = levels[currentLevel - 1]
 
   return (
     <>
       {isPlaying && <Player/>}
-      <Sector type='start' {...level.start}/>
-      {level.sectors.map((sector) => {
+      <Sector type='start'/>
+      {sectors.map((sector) => {
         const key = `${currentLevel}_${sector.x}_${sector.z}`
         return (
           <Sector
             key={key}
-            {...sector}
+            x={sector.x}
+            z={sector.z}
+            sizeX={sector.sizeX}
+            sizeZ={sector.sizeZ}
           />
         )
       })}
-      <Sector type='finish' {...level.finish}/>
+      <Sector
+        key={`${finish.x}_${finish.z}`}
+        type='finish'
+        x={finish.x}
+        z={finish.z}
+      />
     </>
   )
 }
