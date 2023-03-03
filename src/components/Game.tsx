@@ -32,11 +32,14 @@ import {
 } from '@react-three/cannon'
 import {
   RecoilRoot,
-  atom,
   useRecoilState,
   useRecoilValue,
   useSetRecoilState,
 } from 'recoil'
+import {
+  gameState,
+  GameState,
+} from './state'
 import { HideMouse } from './HideMouse'
 
 /**
@@ -63,20 +66,6 @@ const material = {
   restitution: 0.6,
   friction: 1.1,
 }
-
-/**
- * State
- */
-enum GameState {
-  initial = 'initial',
-  playing = 'playing',
-  lost = 'lost',
-  won = 'won',
-}
-const gameState = atom<GameState>({
-  key: 'gameState',
-  default: GameState.initial,
-});
 
 /**
  * Keyboard input
