@@ -8,7 +8,7 @@ export const cameraShiftX = 0
 export const cameraShiftY = 4
 export const cameraShiftZ = 9
 
-// point light position shift is relative to camera position
+// point light position relative to the camera
 export const pointLightShiftX = 3
 export const pointLightShiftY = 1
 export const pointLightShiftZ = -2
