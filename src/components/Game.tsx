@@ -1,5 +1,4 @@
 import {
-  Fragment,
   useCallback,
   useEffect,
 } from 'react'
@@ -7,20 +6,14 @@ import {
   Canvas,
 } from '@react-three/fiber'
 import {
-  Physics,
-  Debug,
-} from '@react-three/cannon'
-import {
   RecoilRoot,
   useRecoilState,
-  useRecoilValue,
 } from 'recoil'
 import {
   gameState,
   GameState,
 } from './state'
 import {
-  isPhysicsDebug,
   cameraShiftX,
   cameraShiftY,
   cameraShiftZ,
@@ -29,29 +22,8 @@ import {
   KeyboardControlsRoot,
 } from './KeyboardControls'
 import { HideMouse } from './HideMouse'
-import { Player } from './Player'
-import { Sector } from './Sector'
 import { Light } from './Light'
-
-const GamePhysicsComponents = () => {
-  const CannonDebug = isPhysicsDebug ? Debug : Fragment
-  const cannonDebugProps = isPhysicsDebug ? { color: 'green', scale: 1.01 } : {} 
-
-  const _gameState = useRecoilValue(gameState)
-  const isPlaying = _gameState === GameState.playing
-
-  return (
-    <Physics>
-      <CannonDebug {...cannonDebugProps}>
-        {isPlaying && <Player/>}
-        <Sector type='start'/>
-        <Sector z={1} sizeZ={8}/>
-        <Sector z={9} sizeX={4}/>
-        <Sector type='finish' z={9} x={4}/>
-      </CannonDebug>
-    </Physics>
-  )
-}
+import { GameplayComponents } from './GameplayComponents'
 
 /**
  * UI component
@@ -113,7 +85,7 @@ export const Game = () => {
             }}
           >
             <Light/>
-            <GamePhysicsComponents/>
+            <GameplayComponents/>
           </Canvas>
         </KeyboardControlsRoot>
       </div>
