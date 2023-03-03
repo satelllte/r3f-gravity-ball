@@ -8,8 +8,8 @@ export interface FinishSector {
   z: number
 }
 
-export interface DefaultSector {
-  type: 'default'
+export interface StaticSector {
+  type: 'static'
   sizeX: number
   sizeZ: number
   x: number
@@ -19,4 +19,4 @@ export interface DefaultSector {
 export type Sector =
   | StartSector
   | FinishSector
-  | DefaultSector
+  | StaticSector

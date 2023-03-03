@@ -23,8 +23,8 @@ import { Sector as SectorProps } from './types/Sector'
 export const Sector = (props: SectorProps) => {
   const x = props.type === 'start' ? 0 : props.x
   const z = props.type === 'start' ? 0 : props.z
-  const sizeX = props.type !== 'default' ? 1 : props.sizeX
-  const sizeZ = props.type !== 'default' ? 1 : props.sizeZ
+  const sizeX = props.type !== 'static' ? 1 : props.sizeX
+  const sizeZ = props.type !== 'static' ? 1 : props.sizeZ
   const size = 5
   const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
   const setGameState = useSetRecoilState(gameState)

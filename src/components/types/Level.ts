@@ -1,9 +1,9 @@
 import {
   FinishSector,
-  DefaultSector,
+  StaticSector,
 } from './Sector'
 
-type InBetweenSector = DefaultSector
+type InBetweenSector = StaticSector
 
 export interface Level {
   sectors: InBetweenSector[]
