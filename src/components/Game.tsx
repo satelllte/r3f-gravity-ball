@@ -40,32 +40,18 @@ import {
   gameState,
   GameState,
 } from './state'
+import {
+  isPhysicsDebug,
+  isLightDebug,
+  cameraShiftX,
+  cameraShiftY,
+  cameraShiftZ,
+  pointLightShiftX,
+  pointLightShiftY,
+  pointLightShiftZ,
+  material,
+} from './constants'
 import { HideMouse } from './HideMouse'
-
-/**
- * Constants (development only)
- */
-const isDev = process.env.NODE_ENV === 'development'
-const isPhysicsDebug = isDev && process.env.NEXT_PUBLIC_DEV_PHYSICS_DEBUG === '1'
-const isLightDebug = isDev && process.env.NEXT_PUBLIC_DEV_LIGHT_DEBUG === '1'
-
-/**
- * Constants
- */
-const cameraShiftX = 0
-const cameraShiftY = 4
-const cameraShiftZ = 9
-
-// point light position shift is relative to camera position
-const pointLightShiftX = 3
-const pointLightShiftY = 1
-const pointLightShiftZ = -2
-
-const material = {
-  name: 'defaultMaterial',
-  restitution: 0.6,
-  friction: 1.1,
-}
 
 /**
  * Keyboard input
