@@ -1,5 +1,7 @@
 import {
+  forwardRef,
   useEffect,
+  useImperativeHandle,
   useRef,
 } from 'react'
 import {
@@ -33,7 +35,7 @@ import {
   useGetKeyboardControls,
 } from './KeyboardControls'
 
-export const Player = () => {
+export const Player = forwardRef<Mesh>((_, forwardedRef) => {
   const [_gameState, setGameState] = useRecoilState(gameState)
   const isPlaying = _gameState === GameState.playing
 
@@ -49,6 +51,8 @@ export const Player = () => {
     }),
     useRef<Mesh>(null),
   )
+
+  useImperativeHandle(forwardedRef, () => ref.current as Mesh, [ref])
 
   const { camera } = useThree()
   const positionRef = useRef<Triplet>([0, 1, 0])
@@ -130,4 +134,6 @@ export const Player = () => {
       <meshStandardMaterial map={colorMap} />
     </mesh>
   )
-}
+})
+
+Player.displayName = 'Player'

@@ -16,7 +16,14 @@ export interface StaticSector {
   z: number
 }
 
+export interface FallSector {
+  type: 'fall'
+  x: number
+  z: number
+}
+
 export type Sector =
   | StartSector
   | FinishSector
   | StaticSector
+  | FallSector
