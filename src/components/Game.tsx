@@ -18,10 +18,7 @@ import {
   useLoader,
 } from '@react-three/fiber'
 import {
-  KeyboardControls,
-  KeyboardControlsEntry,
   useHelper,
-  useKeyboardControls,
 } from '@react-three/drei'
 import {
   Physics,
@@ -51,24 +48,11 @@ import {
   pointLightShiftZ,
   material,
 } from './constants'
+import {
+  KeyboardControlsRoot,
+  useGetKeyboardControls,
+} from './KeyboardControls'
 import { HideMouse } from './HideMouse'
-
-/**
- * Keyboard input
- */
-enum Controls {
-  forward = 'forward',
-  left = 'left',
-  right = 'right',
-  back = 'back',
-}
-
-const keyboardControlsMap: KeyboardControlsEntry<Controls>[] = [
-  { name: Controls.forward, keys: ['ArrowUp', 'KeyW'] },
-  { name: Controls.left, keys: ['ArrowLeft', 'KeyA'] },
-  { name: Controls.right, keys: ['ArrowRight', 'KeyD'] },
-  { name: Controls.back, keys: ['ArrowDown', 'KeyS'] },
-]
 
 /**
  * Player component
@@ -93,7 +77,7 @@ const Player = () => {
   const { camera } = useThree()
   const positionRef = useRef<Triplet>([0, 1, 0])
 
-  const [, getControls] = useKeyboardControls<Controls>()
+  const getKeyboardControls = useGetKeyboardControls()
 
   useEffect(() => {
     camera.position.set(cameraShiftX, cameraShiftY, cameraShiftZ)
@@ -142,7 +126,7 @@ const Player = () => {
       left,
       right,
       back,
-    } = getControls()
+    } = getKeyboardControls()
 
     const centerPoint: Triplet = [0, 0, 0]
 
@@ -349,7 +333,7 @@ export const Game = () => {
       <div className='h-screen'>
         <UI/>
         <HideMouse/>
-        <KeyboardControls map={keyboardControlsMap}>
+        <KeyboardControlsRoot>
           <Canvas
             shadows='basic'
             camera={{
@@ -359,7 +343,7 @@ export const Game = () => {
             <Light/>
             <GamePhysicsComponents/>
           </Canvas>
-        </KeyboardControls>
+        </KeyboardControlsRoot>
       </div>
     </RecoilRoot>
   )
