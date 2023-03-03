@@ -220,7 +220,7 @@ const Sector = ({
   x = 0,
   z = 0,
 }: SectorProps) => {
-  const size = 6
+  const size = 5
   const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
   const setGameState = useSetRecoilState(gameState)
   const [ref] = useBox(() => ({
