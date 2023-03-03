@@ -1,15 +1,16 @@
-import { Canvas } from '@react-three/fiber'
+import dynamic from 'next/dynamic'
 import { RecoilRoot } from 'recoil'
 import { KeyboardControlsRoot } from './KeyboardControls'
 import { UI } from './UI'
 import { HideMouse } from './HideMouse'
-import { Light } from './Light'
-import { GameplayComponents } from './GameplayComponents'
-import {
-  cameraShiftX,
-  cameraShiftY,
-  cameraShiftZ,
-} from './constants'
+
+const CanvasRootLazy = dynamic(() =>
+  import('./CanvasRoot').then((mod) => mod.CanvasRoot),
+  // TODO: add level loading screen
+  // {
+  //   loading: () => <>Loading...</>,
+  // }
+)
 
 export const Game = () => {
   return (
@@ -18,15 +19,7 @@ export const Game = () => {
         <UI/>
         <HideMouse/>
         <KeyboardControlsRoot>
-          <Canvas
-            shadows='basic'
-            camera={{
-              position: [cameraShiftX, cameraShiftY, cameraShiftZ],
-            }}
-          >
-            <Light/>
-            <GameplayComponents/>
-          </Canvas>
+          <CanvasRootLazy/>
         </KeyboardControlsRoot>
       </div>
     </RecoilRoot>
