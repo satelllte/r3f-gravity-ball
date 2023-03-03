@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
+import { levels } from './levels'
 import {
   gameState,
   GameState,
@@ -8,7 +9,7 @@ import {
 
 export const UI = () => {
   const [_gameState, setGameState] = useRecoilState(gameState)
-  const [, setLevelState] = useRecoilState(levelState)
+  const [, setLevel] = useRecoilState(levelState)
   const initial = _gameState === GameState.initial
   const lost = _gameState === GameState.lost
   const won = _gameState === GameState.won
@@ -16,10 +17,16 @@ export const UI = () => {
 
   const start = useCallback(() => {
     if (won) {
-      setLevelState(l => l + 1)
+      setLevel((lvl) => {
+        const hasMoreLevels = lvl < levels.length
+        if (hasMoreLevels) {
+          return lvl + 1
+        }
+        return 1
+      })
     }
     setGameState(GameState.playing)
-  }, [won, setLevelState, setGameState])
+  }, [won, setLevel, setGameState])
 
   useEffect(() => {
     if (skip) {

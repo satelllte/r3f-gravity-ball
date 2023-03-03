@@ -20,31 +20,39 @@ import { Player } from './Player'
 import { Sector } from './Sector'
 import { levels } from './levels'
 
-export const GameplayComponents = () => {
-  const CannonDebug = isPhysicsDebug ? Debug : Fragment
-  const cannonDebugProps = isPhysicsDebug ? { color: 'green', scale: 1.01 } : {} 
-
+const LevelObjects = () => {
   const _gameState = useRecoilValue(gameState)
   const isPlaying = _gameState === GameState.playing
 
   const currentLevel = useRecoilValue(levelState)
-  const level = levels[currentLevel - 1] // TODO: handle last level
+  const level = levels[currentLevel - 1]
+
+  return (
+    <>
+      {isPlaying && <Player/>}
+      <Sector type='start' {...level.start}/>
+      {level.sectors.map((sector) => {
+        const key = `${currentLevel}_${sector.x}_${sector.z}`
+        return (
+          <Sector
+            key={key}
+            {...sector}
+          />
+        )
+      })}
+      <Sector type='finish' {...level.finish}/>
+    </>
+  )
+}
+
+export const GameplayComponents = () => {
+  const CannonDebug = isPhysicsDebug ? Debug : Fragment
+  const cannonDebugProps = isPhysicsDebug ? { color: 'green', scale: 1.01 } : {}
 
   return (
     <Physics>
       <CannonDebug {...cannonDebugProps}>
-        {isPlaying && <Player/>}
-        <Sector type='start' {...level.start}/>
-        {level.sectors.map((sector) => {
-          const key = `${currentLevel}_${sector.x}_${sector.z}`
-          return (
-            <Sector
-              key={key}
-              {...sector}
-            />
-          )
-        })}
-        <Sector type='finish' {...level.finish}/>
+        <LevelObjects/>
       </CannonDebug>
     </Physics>
   )
