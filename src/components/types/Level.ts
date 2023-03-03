@@ -1,7 +1,11 @@
-import { Sector } from './Sector'
+import {
+  FinishSector,
+  DefaultSector,
+} from './Sector'
+
+type InBetweenSector = DefaultSector
 
 export interface Level {
-  start: Omit<Sector, 'type' | 'sizeX' | 'sizeZ'>
-  sectors: Sector[]
-  finish: Omit<Sector, 'type' | 'sizeX' | 'sizeZ'>
+  sectors: InBetweenSector[]
+  finish: FinishSector
 }

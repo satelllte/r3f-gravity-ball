@@ -36,6 +36,7 @@ const LevelObjects = () => {
         return (
           <Sector
             key={key}
+            type={sector.type}
             x={sector.x}
             z={sector.z}
             sizeX={sector.sizeX}

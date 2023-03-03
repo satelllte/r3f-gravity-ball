@@ -1,9 +1,6 @@
 import { Level } from '../types/Level'
 
 export const level2: Level = {
-  start: {
-    x: 0, z: 0,
-  },
   sectors: [
     { x: 0, z: 1, sizeX: 1, sizeZ: 6, type: 'default' },
     { x: -1, z: 6, sizeX: 1, sizeZ: 2, type: 'default' },
@@ -15,6 +12,6 @@ export const level2: Level = {
     { x: 1, z: 13, sizeX: 1, sizeZ: 2, type: 'default' },
   ],
   finish: {
-    x: 2, z: 14,
+    x: 2, z: 14, type: 'finish'
   },
 }

@@ -18,27 +18,13 @@ import {
 import {
   material,
 } from './constants'
+import { Sector as SectorProps } from './types/Sector'
 
-type SectorType =
-  | 'default'
-  | 'start'
-  | 'finish'
-
-interface SectorProps {
-  type?: SectorType
-  sizeX?: number
-  sizeZ?: number
-  x?: number
-  z?: number
-}
-
-export const Sector = ({
-  type = 'default',
-  sizeX = 1,
-  sizeZ = 1,
-  x = 0,
-  z = 0,
-}: SectorProps) => {
+export const Sector = (props: SectorProps) => {
+  const x = props.type === 'start' ? 0 : props.x
+  const z = props.type === 'start' ? 0 : props.z
+  const sizeX = props.type !== 'default' ? 1 : props.sizeX
+  const sizeZ = props.type !== 'default' ? 1 : props.sizeZ
   const size = 5
   const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
   const setGameState = useSetRecoilState(gameState)
@@ -51,7 +37,7 @@ export const Sector = ({
         -z * size - (size * (sizeZ - 1) * 0.5),
       ],
       onCollideBegin: () => {
-        if (type !== 'finish') {
+        if (props.type !== 'finish') {
           return
         }
         setTimeout(() => {
@@ -63,9 +49,9 @@ export const Sector = ({
   )
 
   let color = 'gray'
-  if (type === 'start') {
+  if (props.type === 'start') {
     color = 'cyan'
-  } else if (type === 'finish') {
+  } else if (props.type === 'finish') {
     color = 'lime'
   }
 
