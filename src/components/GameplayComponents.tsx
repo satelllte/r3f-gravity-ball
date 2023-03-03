@@ -10,6 +10,7 @@ import {
 } from 'recoil'
 import {
   gameState,
+  levelState,
   GameState,
 } from './state'
 import {
@@ -17,6 +18,7 @@ import {
 } from './constants'
 import { Player } from './Player'
 import { Sector } from './Sector'
+import { levels } from './levels'
 
 export const GameplayComponents = () => {
   const CannonDebug = isPhysicsDebug ? Debug : Fragment
@@ -25,14 +27,24 @@ export const GameplayComponents = () => {
   const _gameState = useRecoilValue(gameState)
   const isPlaying = _gameState === GameState.playing
 
+  const currentLevel = useRecoilValue(levelState)
+  const level = levels[currentLevel - 1] // TODO: handle last level
+
   return (
     <Physics>
       <CannonDebug {...cannonDebugProps}>
         {isPlaying && <Player/>}
-        <Sector type='start'/>
-        <Sector z={1} sizeZ={8}/>
-        <Sector z={9} sizeX={4}/>
-        <Sector type='finish' z={9} x={4}/>
+        <Sector type='start' {...level.start}/>
+        {level.sectors.map((sector) => {
+          const key = `${currentLevel}_${sector.x}_${sector.z}`
+          return (
+            <Sector
+              key={key}
+              {...sector}
+            />
+          )
+        })}
+        <Sector type='finish' {...level.finish}/>
       </CannonDebug>
     </Physics>
   )

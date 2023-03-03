@@ -8,6 +8,11 @@ export enum GameState {
 }
 
 export const gameState = atom<GameState>({
-  key: 'gameState',
+  key: 'game',
   default: GameState.initial,
+})
+
+export const levelState = atom<number>({
+  key: 'level',
+  default: 1,
 })

@@ -3,18 +3,23 @@ import { useRecoilState } from 'recoil'
 import {
   gameState,
   GameState,
+  levelState,
 } from './state'
 
 export const UI = () => {
   const [_gameState, setGameState] = useRecoilState(gameState)
+  const [, setLevelState] = useRecoilState(levelState)
   const initial = _gameState === GameState.initial
   const lost = _gameState === GameState.lost
   const won = _gameState === GameState.won
   const skip = !initial && !lost && !won
 
   const start = useCallback(() => {
+    if (won) {
+      setLevelState(l => l + 1)
+    }
     setGameState(GameState.playing)
-  }, [setGameState])
+  }, [won, setLevelState, setGameState])
 
   useEffect(() => {
     if (skip) {
