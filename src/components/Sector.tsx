@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BackSide, Mesh } from 'three'
+import { Mesh } from 'three'
 import { useBox, Triplet } from '@react-three/cannon'
 import { useSetRecoilState } from 'recoil'
 import { gameState, GameState } from './state'
@@ -80,6 +80,20 @@ const Inner = (props: InnerProps) => {
       return
     }
     props.onDestroy()
+  })
+
+  useFrame(({ clock }) => {
+    if (props.type !== 'moving') {
+      return
+    }
+
+    const speed = 2
+
+    api.position.set(
+      initialPosition[0] + Math.sin(props.shift + speed * clock.getElapsedTime()) * size,
+      positionRef.current[1],
+      positionRef.current[2],
+    )
   })
 
   let color = '#FBFBF2'

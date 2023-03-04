@@ -7,8 +7,4 @@ export const cameraShiftX = 0
 export const cameraShiftY = 4
 export const cameraShiftZ = 9
 
-export const material = {
-  name: 'defaultMaterial',
-  restitution: 0.6,
-  friction: 1.1,
-}
+export const material = 'default'

@@ -19,11 +19,12 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
 
   const [ref, api] = useSphere(
     () => ({
+      type: 'Dynamic',
       mass: 1,
       material,
       position: [0, 1, 0],
-      linearDamping: 0.2,
-      angularDamping: 0.35,
+      linearDamping: 0.15,
+      angularDamping: 0.25,
     }),
     useRef<Mesh>(null),
   )
@@ -86,18 +87,19 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     } = getKeyboardControls()
 
     const centerPoint: Triplet = [0, 0, 0]
+    const force = 0.45
 
     if (forward) {
-      api.applyImpulse([0, 0, -1], centerPoint)
+      api.applyImpulse([0, 0, -force], centerPoint)
     }
     if (back) {
-      api.applyImpulse([0, 0, 1], centerPoint)
+      api.applyImpulse([0, 0, force], centerPoint)
     }
     if (left) {
-      api.applyImpulse([-1, 0, 0], centerPoint)
+      api.applyImpulse([-force, 0, 0], centerPoint)
     }
     if (right) {
-      api.applyImpulse([1, 0, 0], centerPoint)
+      api.applyImpulse([force, 0, 0], centerPoint)
     }
   })
 

@@ -22,8 +22,16 @@ export interface FallSector {
   z: number
 }
 
+export interface MovingSector {
+  type: 'moving'
+  x: number
+  z: number
+  shift: number /* shift of the sinewave phase in radians */
+}
+
 export type Sector =
   | StartSector
   | FinishSector
   | StaticSector
   | FallSector
+  | MovingSector

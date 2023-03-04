@@ -1,13 +1,13 @@
 import { Fragment, useRef } from 'react'
 import { Mesh } from 'three'
-import { Physics, Debug } from '@react-three/cannon'
+import { Physics, Debug, useContactMaterial } from '@react-three/cannon'
 import { useRecoilValue } from 'recoil'
 import {
   gameState,
   levelState,
   GameState,
 } from './state'
-import { isPhysicsDebug } from './constants'
+import { isPhysicsDebug, material } from './constants'
 import { Player } from './Player'
 import { Sector } from './Sector'
 import { levels } from './levels'
@@ -30,26 +30,11 @@ const LevelObjects = () => {
       />
       {sectors.map((sector) => {
         const key = `${isPlaying}_${currentLevel}_${sector.x}_${sector.z}`
-        if (sector.type === 'static') {
-          return (
-            <Sector
-              key={key}
-              playerRef={playerRef}
-              type={sector.type}
-              x={sector.x}
-              z={sector.z}
-              sizeX={sector.sizeX}
-              sizeZ={sector.sizeZ}
-            />
-          )
-        }
         return (
           <Sector
             key={key}
             playerRef={playerRef}
-            type={sector.type}
-            x={sector.x}
-            z={sector.z}
+            {...sector}
           />
         )
       })}
@@ -64,6 +49,18 @@ const LevelObjects = () => {
   )
 }
 
+const PhysicsContacts = () => {
+  useContactMaterial(material, material, {
+    restitution: 0.4,
+    friction: 0.8,
+    frictionEquationStiffness: 1e9,
+    frictionEquationRelaxation: 3,
+    contactEquationStiffness: 1e9,
+    contactEquationRelaxation: 10,
+  })
+  return null
+}
+
 export const GameplayComponents = () => {
   const CannonDebug = isPhysicsDebug ? Debug : Fragment
   const cannonDebugProps = isPhysicsDebug ? { color: 'green', scale: 1.01 } : {}
@@ -71,6 +68,7 @@ export const GameplayComponents = () => {
   return (
     <Physics>
       <CannonDebug {...cannonDebugProps}>
+        <PhysicsContacts/>
         <LevelObjects/>
       </CannonDebug>
     </Physics>
