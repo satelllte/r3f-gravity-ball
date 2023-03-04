@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic'
 import { RecoilRoot } from 'recoil'
 import { KeyboardControlsRoot } from './KeyboardControls'
 import { UI } from './UI'
+import { DisablePageScroll } from './DisablePageScroll'
 import { HideMouse } from './HideMouse'
 
 const CanvasRootLazy = dynamic(() =>
@@ -15,9 +16,10 @@ const CanvasRootLazy = dynamic(() =>
 export const Game = () => {
   return (
     <RecoilRoot>
+      <DisablePageScroll/>
+      <HideMouse/>
       <div className='h-screen'>
         <UI/>
-        <HideMouse/>
         <KeyboardControlsRoot>
           <CanvasRootLazy/>
         </KeyboardControlsRoot>
