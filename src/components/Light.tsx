@@ -29,6 +29,8 @@ export const Light = () => {
     'red',
   )
 
+  const vec3Ref = useRef(new Vector3())
+
   useFrame((_, delta) => {
     if (!pointLightRef.current) {
       return
@@ -37,7 +39,7 @@ export const Light = () => {
     const pointLight = pointLightRef.current
 
     pointLight.position.lerp(
-      new Vector3(
+      vec3Ref.current.set(
         camera.position.x + pointLightShiftX,
         camera.position.y + pointLightShiftY,
         camera.position.z + pointLightShiftZ,

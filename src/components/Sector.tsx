@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mesh } from 'three'
+import { Mesh, RepeatWrapping } from 'three'
 import { useBox, Triplet } from '@react-three/cannon'
 import { useSetRecoilState } from 'recoil'
 import { gameState, GameState } from './state'
@@ -7,6 +7,8 @@ import { material } from './constants'
 import { Sector as ISector } from './types/Sector'
 import { randFloat } from 'three/src/math/MathUtils'
 import { useFrame } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
+import { isArray } from 'lodash-es'
 
 type InnerProps = SectorProps & {
   onDestroy: () => void
@@ -82,7 +84,7 @@ const Inner = (props: InnerProps) => {
     props.onDestroy()
   })
 
-  let color = 'gray'
+  let color = 'white'
   if (props.type === 'start') {
     color = 'cyan'
   } else if (props.type === 'finish') {
@@ -91,13 +93,36 @@ const Inner = (props: InnerProps) => {
     color = 'red'
   }
 
+  const textureTop = useTexture(
+    `/texture-cell.png?key=Sector&sizeX=${sizeX}&sizeZ=${sizeZ}`,
+    (texture) => {
+      if (isArray(texture)) {
+        return
+      }
+      texture.wrapS = RepeatWrapping
+      texture.wrapT = RepeatWrapping
+      texture.repeat.set(sizeX * 2, sizeZ * 2)
+    }
+  )
+
   return (
     <mesh
       ref={ref}
       receiveShadow
     >
       <boxGeometry args={args}/>
-      <meshStandardMaterial color={color} />
+      {/* right */}
+      <meshStandardMaterial attach='material-0' color={color}/>
+      {/* left */}
+      <meshStandardMaterial attach='material-1' color={color}/>
+      {/* top */}
+      <meshStandardMaterial attach='material-2' color={color} map={textureTop}/>
+      {/* bottom */}
+      <meshStandardMaterial attach='material-3' color={color}/>
+      {/* front */}
+      <meshStandardMaterial attach='material-4' color={color}/>
+      {/* back */}
+      <meshStandardMaterial attach='material-5' color={color}/>
     </mesh>
   )
 }

@@ -1,45 +1,21 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react'
-import {
-  Mesh,
-  TextureLoader,
-  Vector3,
-} from 'three'
-import {
-  useFrame,
-  useThree,
-  useLoader,
-} from '@react-three/fiber'
-import {
-  useSphere,
-  Triplet,
-} from '@react-three/cannon'
-import {
-  useRecoilState,
-} from 'recoil'
-import {
-  gameState,
-  GameState,
-} from './state'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { Mesh, Vector3 } from 'three'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useSphere, Triplet } from '@react-three/cannon'
+import { useTexture } from '@react-three/drei'
+import { useRecoilState } from 'recoil'
+import { useGetKeyboardControls } from './KeyboardControls'
+import { gameState, GameState } from './state'
 import {
   cameraShiftX,
   cameraShiftY,
   cameraShiftZ,
   material,
 } from './constants'
-import {
-  useGetKeyboardControls,
-} from './KeyboardControls'
 
 export const Player = forwardRef<Mesh>((_, forwardedRef) => {
   const [_gameState, setGameState] = useRecoilState(gameState)
   const isPlaying = _gameState === GameState.playing
-
-  const colorMap = useLoader(TextureLoader, '/ball-texture.png')
 
   const [ref, api] = useSphere(
     () => ({
@@ -75,6 +51,7 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     return unsubscribe
   }, [api])
 
+  const vec3Ref = useRef(new Vector3())
   useFrame((_, delta) => {
     if (!isPlaying) {
       return
@@ -82,7 +59,7 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
 
     if (positionRef.current[1] > -2.5) {
       camera.position.lerp(
-        new Vector3(
+        vec3Ref.current.set(
           positionRef.current[0] + cameraShiftX,
           positionRef.current[1] + cameraShiftY,
           positionRef.current[2] + cameraShiftZ,
@@ -124,6 +101,8 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     }
   })
 
+  const texture = useTexture('/texture-cell.png?key=Player')
+
   return (
     <mesh
       ref={ref}
@@ -131,7 +110,7 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
       castShadow
     >
       <sphereGeometry />
-      <meshStandardMaterial map={colorMap} />
+      <meshStandardMaterial map={texture} />
     </mesh>
   )
 })
