@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { Mesh, Vector3 } from 'three'
+import { Mesh, RepeatWrapping, Vector3 } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useSphere, Triplet } from '@react-three/cannon'
 import { useTexture } from '@react-three/drei'
@@ -101,7 +101,14 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     }
   })
 
-  const texture = useTexture('/texture-cell.png?key=Player')
+  const texture = useTexture('/texture-ball.png', (texture) => {
+    if (Array.isArray(texture)) {
+      return
+    }
+    texture.wrapS = RepeatWrapping
+    texture.wrapT = RepeatWrapping
+    texture.repeat.set(1, 4)
+  })
 
   return (
     <mesh
@@ -110,7 +117,10 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
       castShadow
     >
       <sphereGeometry />
-      <meshStandardMaterial map={texture} />
+      <meshStandardMaterial
+        map={texture}
+        color='#FFA500'
+      />
     </mesh>
   )
 })

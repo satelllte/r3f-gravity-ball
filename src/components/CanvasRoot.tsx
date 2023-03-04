@@ -1,5 +1,4 @@
 import { Canvas } from '@react-three/fiber'
-import { Light } from './Light'
 import { GameplayComponents } from './GameplayComponents'
 import {
   cameraShiftX,
@@ -15,7 +14,7 @@ export const CanvasRoot = () => {
         position: [cameraShiftX, cameraShiftY, cameraShiftZ],
       }}
     >
-      <Light/>
+      <ambientLight/>
       <GameplayComponents/>
     </Canvas>
   )
