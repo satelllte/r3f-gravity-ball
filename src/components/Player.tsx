@@ -46,7 +46,7 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
       mass: 1,
       material,
       position: [0, 1, 0],
-      // linearDamping: 0.5,
+      linearDamping: 0.2,
       angularDamping: 0.35,
     }),
     useRef<Mesh>(null),
