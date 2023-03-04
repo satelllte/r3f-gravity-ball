@@ -14,8 +14,7 @@ import {
 } from './constants'
 
 export const Player = forwardRef<Mesh>((_, forwardedRef) => {
-  const [_gameState, setGameState] = useRecoilState(gameState)
-  const isPlaying = _gameState === GameState.playing
+  const [, setGameState] = useRecoilState(gameState)
 
   const [ref, api] = useSphere(
     () => ({
@@ -54,10 +53,6 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
 
   const vec3Ref = useRef(new Vector3())
   useFrame((_, delta) => {
-    if (!isPlaying) {
-      return
-    }
-
     if (positionRef.current[1] > -2.5) {
       camera.position.lerp(
         vec3Ref.current.set(

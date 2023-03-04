@@ -51,7 +51,7 @@ const LevelObjects = () => {
 
 const PhysicsContacts = () => {
   useContactMaterial(material, material, {
-    restitution: 0.4,
+    restitution: 0.01,
     friction: 0.8,
     frictionEquationStiffness: 1e9,
     frictionEquationRelaxation: 3,

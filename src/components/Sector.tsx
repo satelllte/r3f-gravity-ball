@@ -17,7 +17,7 @@ const Inner = (props: InnerProps) => {
   const z = props.type === 'start' ? 0 : props.z
   const sizeX = props.type !== 'static' ? 1 : props.sizeX
   const sizeZ = props.type !== 'static' ? 1 : props.sizeZ
-  const size = 5
+  const size = 4
   const args: Triplet = [size * sizeX, 0.75, size * sizeZ]
   const initialPosition: Triplet = [
     x * size + (size * (sizeX - 1) * 0.5),
