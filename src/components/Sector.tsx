@@ -100,11 +100,8 @@ const Inner = (props: InnerProps) => {
   if (props.type === 'start') {
     color = '#3B99FC'
   } else if (props.type === 'finish') {
-    // color = '#00C853'
     color = '#10a37f'
   } else if (props.type === 'fall') {
-    // color = '#FF6B6B'
-    // color = '#e33636'
     color = '#a62929'
   }
 
