@@ -49,9 +49,10 @@ export const UI = () => {
   }
 
   return (
-    <div onClick={start} className='absolute inset-0 z-10 bg-black/50 flex flex-col justify-center items-center'>
-      {lost && <div>LOST</div>}
-      {won && <div>WON</div>}
+    <div onClick={start} className='absolute inset-0 z-10 bg-black/75 p-12 flex flex-col items-center justify-between'>
+      <h1 className='uppercase text-5xl'>Gravity Ball</h1>
+      {lost && <div className='text-2xl text-red-500'>LOST</div>}
+      {won && <div className='text-2xl text-green-500'>WON</div>}
       <div>Press any key to play</div>
     </div>
   )
