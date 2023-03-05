@@ -1,6 +1,8 @@
-# Dark Ball
+# Gravity Ball
 
-Ball game based on React-Three-Fiber.
+Simple game with @react-three/fiber, @react-three/cannon, Next.js
+
+_NOTE: this is a simple draft, not a final product_
 
 ## Local development
 
