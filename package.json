@@ -16,7 +16,7 @@
     "@next/font": "13.1.6",
     "@react-three/cannon": "6.5.2",
     "@react-three/drei": "9.56.25",
-    "@react-three/fiber": "8.11.2",
+    "@react-three/fiber": "8.11.7",
     "cannon-es": "0.20.0",
     "lodash-es": "4.17.21",
     "next": "13.1.6",
