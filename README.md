@@ -4,6 +4,12 @@ Simple game with @react-three/fiber
 
 _NOTE: this is a simple draft, not a final product_
 
+<img width="500" src="screenshots/screenshot-1.png">
+
+<img width="500" src="screenshots/screenshot-2.png">
+
+<img width="500" src="screenshots/screenshot-3.png">
+
 ## Local development
 
 Set Node.js version specified in `.nvmrc` file:
