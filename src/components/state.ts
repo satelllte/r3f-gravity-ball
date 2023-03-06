@@ -14,5 +14,10 @@ export const gameState = atom<GameState>({
 
 export const levelState = atom<number>({
   key: 'level',
-  default: 1,
+  default: 0,
+})
+
+export const levelSeedState = atom<number>({
+  key: 'levelSeed',
+  default: 0,
 })
