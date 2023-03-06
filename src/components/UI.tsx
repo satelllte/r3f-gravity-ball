@@ -53,27 +53,27 @@ export const UI = () => {
     <div className='absolute inset-0 z-10 bg-black/80 p-12 flex flex-col text-center items-center justify-between'>
       <h1 className='uppercase text-5xl'>Gravity Ball</h1>
 
-      {lost && (
-        <div>
-          <div className='uppercase text-3xl text-red-500'>Lost</div>
-          <button
-            onClick={regenerateLevel}
-            className='uppercase text-xl border border-white py-1 p-4 my-4'
-          >
-            Regenerate Level
-          </button>
-        </div>
-      )}
-
-      {won && <div className='uppercase text-3xl text-green-500'>Won</div>}
-
       <div>
+        {won && <div className='uppercase text-3xl text-green-500'>Won</div>}
+        {lost && <div className='uppercase text-3xl text-red-500'>Lost</div>}
+
         <button
           onClick={start}
           className='uppercase text-xl border border-white py-1 p-4 my-4'
         >
           Play
         </button>
+      </div>
+
+      <div>
+        {lost && (
+          <button
+            onClick={regenerateLevel}
+            className='uppercase text-xl border border-white py-1 p-4'
+          >
+            Regenerate Level
+          </button>
+        )}
       </div>
     </div>
   )
