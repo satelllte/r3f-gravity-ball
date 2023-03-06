@@ -1,16 +1,24 @@
-import { Fragment, useRef } from 'react'
+import { Fragment, useEffect, useMemo, useRef } from 'react'
 import { Mesh } from 'three'
+import { useThree } from '@react-three/fiber'
 import { Physics, Debug, useContactMaterial } from '@react-three/cannon'
 import { useRecoilValue } from 'recoil'
 import {
   gameState,
   levelState,
   GameState,
+  levelSeedState,
 } from './state'
-import { isPhysicsDebug, material } from './constants'
+import {
+  cameraShiftX,
+  cameraShiftY,
+  cameraShiftZ,
+  isPhysicsDebug,
+  material,
+} from './constants'
+import { generateLevel } from './levels'
 import { Player } from './Player'
 import { Sector } from './Sector'
-import { levels } from './levels'
 
 const LevelObjects = () => {
   const playerRef = useRef<Mesh>(null)
@@ -18,8 +26,19 @@ const LevelObjects = () => {
   const _gameState = useRecoilValue(gameState)
   const isPlaying = _gameState === GameState.playing
 
-  const currentLevel = useRecoilValue(levelState)
-  const { sectors, finish } = levels[currentLevel - 1]
+  const level = useRecoilValue(levelState)
+  const levelSeed = useRecoilValue(levelSeedState)
+  const { sectors, finish } = useMemo(() => {
+    const generatedLevel = generateLevel(level)
+    return generatedLevel
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [levelSeed, level])
+
+  const { camera } = useThree()
+  useEffect(() => {
+    camera.position.set(cameraShiftX, cameraShiftY, cameraShiftZ)
+    camera.lookAt(0, 0, 0)
+  }, [camera, level, levelSeed])
 
   return (
     <>
@@ -29,7 +48,7 @@ const LevelObjects = () => {
         type='start'
       />
       {sectors.map((sector) => {
-        const key = `${isPlaying}_${currentLevel}_${sector.x}_${sector.z}`
+        const key = `${isPlaying}_${level}_${levelSeed}_${sector.x}_${sector.z}`
         return (
           <Sector
             key={key}
@@ -39,7 +58,7 @@ const LevelObjects = () => {
         )
       })}
       <Sector
-        key={`${isPlaying}_${currentLevel}_${finish.x}_${finish.z}`}
+        key={`${isPlaying}_${level}_${levelSeed}_${finish.x}_${finish.z}`}
         playerRef={playerRef}
         type='finish'
         x={finish.x}

@@ -5,7 +5,7 @@ import {
   MovingSector,
 } from './Sector'
 
-type InBetweenSector =
+export type InBetweenSector =
   | StaticSector
   | FallSector
   | MovingSector

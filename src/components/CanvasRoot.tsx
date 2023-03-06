@@ -9,7 +9,6 @@ import {
 export const CanvasRoot = () => {
   return (
     <Canvas
-      shadows='basic'
       camera={{
         position: [cameraShiftX, cameraShiftY, cameraShiftZ],
       }}
