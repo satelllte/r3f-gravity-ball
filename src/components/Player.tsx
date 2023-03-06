@@ -1,9 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react'
 import { Mesh, RepeatWrapping, Vector3 } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useSphere, Triplet } from '@react-three/cannon'
 import { useTexture } from '@react-three/drei'
 import { useRecoilState } from 'recoil'
+import { CanvasDragContext } from './CanvasRoot'
 import { useGetKeyboardControls } from './KeyboardControls'
 import { gameState, GameState } from './state'
 import {
@@ -32,6 +33,8 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
 
   const { camera } = useThree()
   const positionRef = useRef<Triplet>([0, 1, 0])
+
+  const dragRef = useContext(CanvasDragContext)
 
   const getKeyboardControls = useGetKeyboardControls()
 
@@ -71,6 +74,7 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     }
 
     if (positionRef.current[1] < -12.5) {
+      dragRef.current?.cancel()
       setGameState(GameState.lost)
     }
 
@@ -96,6 +100,21 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     if (right) {
       api.applyImpulse([force, 0, 0], centerPoint)
     }
+
+    if (!dragRef.current || dragRef.current.canceled) {
+      return
+    }
+
+    const [dragX, dragY] = dragRef.current.movement
+    if (!dragX && !dragY) {
+      return
+    }
+
+    api.applyImpulse([
+      force * 0.005 * dragX,
+      0,
+      force * 0.005 * dragY,
+    ], centerPoint)
   })
 
   const texture = useTexture('/texture-ball.png', (texture) => {
