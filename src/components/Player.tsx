@@ -1,10 +1,11 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react'
 import { Mesh, RepeatWrapping, Vector3 } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useSphere, Triplet } from '@react-three/cannon'
 import { useTexture } from '@react-three/drei'
 import { useRecoilState } from 'recoil'
 import { useGetKeyboardControls } from './KeyboardControls'
+import { JoystickContext } from './JoystickControls'
 import { gameState, GameState } from './state'
 import {
   cameraShiftX,
@@ -32,6 +33,8 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
 
   const { camera } = useThree()
   const positionRef = useRef<Triplet>([0, 1, 0])
+
+  const joystickInputRef = useContext(JoystickContext)
 
   const getKeyboardControls = useGetKeyboardControls()
 
@@ -95,6 +98,16 @@ export const Player = forwardRef<Mesh>((_, forwardedRef) => {
     }
     if (right) {
       api.applyImpulse([force, 0, 0], centerPoint)
+    }
+
+    let { x, y } = joystickInputRef.current
+    if (x || y) {
+      x = !x ? 0 : x
+      y = !y ? 0 : -y
+      api.applyImpulse(
+        [force * x, 0, force * y],
+        centerPoint
+      )
     }
   })
 

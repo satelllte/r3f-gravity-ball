@@ -50,7 +50,7 @@ export const UI = () => {
   }
 
   return (
-    <div className='absolute inset-0 z-10 bg-black/80 p-12 flex flex-col text-center items-center justify-between'>
+    <div className='absolute inset-0 z-20 bg-black/80 p-12 flex flex-col text-center items-center justify-between'>
       <h1 className='uppercase text-5xl'>Gravity Ball</h1>
 
       <div>
