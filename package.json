@@ -15,7 +15,7 @@
   "dependencies": {
     "@next/font": "13.1.6",
     "@react-three/cannon": "6.5.2",
-    "@react-three/drei": "9.56.25",
+    "@react-three/drei": "9.57.0",
     "@react-three/fiber": "8.11.2",
     "@use-gesture/react": "10.2.24",
     "cannon-es": "0.20.0",
