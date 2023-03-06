@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import {
   gameState,
@@ -27,24 +27,6 @@ export const UI = () => {
     setLevelSeed(seed => seed + 1)
   }
 
-  useEffect(() => {
-    if (skip) {
-      return
-    }
-    
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        start()
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown, { passive: true })
-
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  }, [skip, start])
-
   if (skip) {
     return null
   }
@@ -68,7 +50,12 @@ export const UI = () => {
       {won && <div className='uppercase text-3xl text-green-500'>Won</div>}
 
       <div>
-        <div className='uppercase'>Press space to play</div>
+        <button
+          onClick={start}
+          className='uppercase text-xl border border-white py-1 p-4 my-4'
+        >
+          Play
+        </button>
       </div>
     </div>
   )
