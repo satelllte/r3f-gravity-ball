@@ -1,5 +1,6 @@
-import { Fragment, useMemo, useRef } from 'react'
+import { Fragment, useEffect, useMemo, useRef } from 'react'
 import { Mesh } from 'three'
+import { useThree } from '@react-three/fiber'
 import { Physics, Debug, useContactMaterial } from '@react-three/cannon'
 import { useRecoilValue } from 'recoil'
 import {
@@ -8,7 +9,13 @@ import {
   GameState,
   levelSeedState,
 } from './state'
-import { isPhysicsDebug, material } from './constants'
+import {
+  cameraShiftX,
+  cameraShiftY,
+  cameraShiftZ,
+  isPhysicsDebug,
+  material,
+} from './constants'
 import { generateLevel } from './levels'
 import { Player } from './Player'
 import { Sector } from './Sector'
@@ -26,6 +33,12 @@ const LevelObjects = () => {
     return generatedLevel
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [levelSeed, level])
+
+  const { camera } = useThree()
+  useEffect(() => {
+    camera.position.set(cameraShiftX, cameraShiftY, cameraShiftZ)
+    camera.lookAt(0, 0, 0)
+  }, [camera, level, levelSeed])
 
   return (
     <>
