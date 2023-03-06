@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import {
   gameState,
   GameState,
@@ -9,8 +9,8 @@ import {
 
 export const UI = () => {
   const [_gameState, setGameState] = useRecoilState(gameState)
-  const [, setLevel] = useRecoilState(levelState)
-  const [, setLevelSeed] = useRecoilState(levelSeedState)
+  const setLevel = useSetRecoilState(levelState)
+  const setLevelSeed = useSetRecoilState(levelSeedState)
   const initial = _gameState === GameState.initial
   const lost = _gameState === GameState.lost
   const won = _gameState === GameState.won
