@@ -29,7 +29,7 @@ export const HUD = () => {
       <Joystick
         baseColor='#FBFBF255'
         stickColor='#3B99FC'
-        size={75}
+        size={100}
         start={updateInput}
         move={updateInput}
         stop={updateInput}
