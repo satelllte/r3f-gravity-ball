@@ -25,11 +25,11 @@ export const HUD = () => {
   }
 
   return (
-    <div className='absolute left-0 bottom-0 z-10 p-8'>
+    <div className='absolute right-0 bottom-0 z-10 p-12'>
       <Joystick
         baseColor='#FBFBF255'
         stickColor='#3B99FC'
-        size={50}
+        size={75}
         start={updateInput}
         move={updateInput}
         stop={updateInput}
