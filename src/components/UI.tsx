@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import {
   gameState,
@@ -26,6 +26,24 @@ export const UI = () => {
   const regenerateLevel = () => {
     setLevelSeed(seed => seed + 1)
   }
+
+  useEffect(() => {
+    if (skip) {
+      return
+    }
+    
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        start()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown, { passive: true })
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [skip, start])
 
   if (skip) {
     return null
