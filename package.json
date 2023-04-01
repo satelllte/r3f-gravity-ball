@@ -28,7 +28,7 @@
     "three": "0.149.0"
   },
   "devDependencies": {
-    "@types/lodash-es": "4.17.6",
+    "@types/lodash-es": "4.17.7",
     "@types/node": "18.11.19",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
