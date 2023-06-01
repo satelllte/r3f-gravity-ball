@@ -13,7 +13,7 @@
     "deps:update": "npm i $(npm outdated | cut -d' ' -f 1 | sed '1d' | xargs -I '$' echo '$@latest' | xargs echo) --save-exact"
   },
   "dependencies": {
-    "@next/font": "13.1.6",
+    "@next/font": "13.4.4",
     "@react-three/cannon": "6.5.2",
     "@react-three/drei": "9.56.25",
     "@react-three/fiber": "8.11.2",
