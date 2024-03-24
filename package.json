@@ -8,7 +8,7 @@
     "start": "next start",
     "export": "next export",
     "prod": "serve out",
-    "lint": "next lint",
+    "test:lint": "next lint",
     "test:types": "tsc",
     "deps:update": "npm i $(npm outdated | cut -d' ' -f 1 | sed '1d' | xargs -I '$' echo '$@latest' | xargs echo) --save-exact"
   },
