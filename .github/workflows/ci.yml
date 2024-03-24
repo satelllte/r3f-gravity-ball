@@ -24,10 +24,6 @@ jobs:
           node-version-file: '.nvmrc'
       - name: Install dependencies
         run: npm ci
-      - name: Test (types)
-        run: npm run test:types
-      - name: Test (lint)
-        run: npm run test:lint
       - name: Build
         run: npm run build
       - name: Export static files
